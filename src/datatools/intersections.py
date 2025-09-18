@@ -126,5 +126,5 @@ def get_intersections(points: Dict[str, List[Tuple[float, float]]],
 
 if __name__ == "__main__":
     from src.datatools.reader import read_annot
-    sample = read_annot('/workdir/data/dataset/train/00000.json')
+    sample = read_annot('data/dataset/train/00000.json')
     print(get_intersections(sample))

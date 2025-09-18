@@ -252,8 +252,8 @@ def loc2img(img: np.ndarray,
 if __name__ == "__main__":
     # An example of reading an image and draw all its extreme points,
     # and draw lines for every extreme points pair.
-    anno_path = '/workdir/data/dataset/train/00000.json'
-    img_path = '/workdir/data/dataset/train/00000.jpg'
+    anno_path = 'data/dataset/train/00000.json'
+    img_path = 'data/dataset/train/00000.jpg'
     sample = read_annot(anno_path)
     sample1 = sort_anno(sample)
     extreme_points = get_extreme_points(sample1[0])

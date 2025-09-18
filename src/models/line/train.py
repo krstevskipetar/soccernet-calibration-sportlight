@@ -12,7 +12,7 @@ from src.models.line.metrics import AccMetric
 from src.models.line.transforms import test_transform, train_transform
 from torch.utils.data import DataLoader
 
-CONFIG_PATH = '/workdir/src/models/line/train_config.yaml'
+CONFIG_PATH = 'src/models/line/train_config.yaml'
 
 
 def get_loader(dataset_path: str, data_params: DictConfig,
@@ -42,7 +42,7 @@ def train(cfg: DictConfig):
     experiment_name = cfg.metadata.experiment_name
     run_name = cfg.metadata.run_name
 
-    save_dir = f'/workdir/data/experiments/{experiment_name}_{run_name}'
+    save_dir = f'data/experiments/{experiment_name}_{run_name}'
     metrics = [AccMetric(cfg.data_params.num_keypoint_pairs)]
     callbacks = [
         EarlyStopping(patience=cfg.train_params.early_stopping_epochs,

@@ -14,9 +14,9 @@ from src.models.hrnet.prediction import CameraCreator
 
 DEVICE = 'cuda:0'  # Device for running inference
 # Update the model path to include the best actual keypoints model
-MODEL_PATH = '/workdir/data/experiments/HRNet_57_hrnet48x2_57_003/evalai-026-0.539460.pth'
-IMG_DIR = '/workdir/data/dataset/challenge/'
-SAVE_DIR = '/workdir/data/submits/challenge_003'
+MODEL_PATH = 'data/experiments/HRNet_57_hrnet48x2_57_003/evalai-026-0.539460.pth'
+IMG_DIR = 'data/dataset/challenge/'
+SAVE_DIR = 'data/submits/challenge_003'
 # Lines model prediction file or None (lines are ignored in that case)
 LINES_FILE = None
 

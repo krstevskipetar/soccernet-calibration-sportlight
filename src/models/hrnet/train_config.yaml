@@ -23,9 +23,9 @@ data_params:
     prob: 0.5
 data:
   train:
-    - /workdir/data/dataset/train
+    - data/dataset/train
   val:
-    - /workdir/data/dataset/valid
+    - data/dataset/valid
 model:
   _target_: src.models.hrnet.metamodel.HRNetMetaModel
   params:

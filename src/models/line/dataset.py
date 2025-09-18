@@ -179,7 +179,7 @@ class EHMDataset(Dataset):
 
 
 if __name__ == "__main__":
-    dataset_path = '/workdir/data/dataset/valid'
+    dataset_path = 'data/dataset/valid'
     data = EHMDataset(dataset_path)
     first_data = data[0]
     print(first_data)

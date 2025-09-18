@@ -22,8 +22,8 @@ data_params:
     gauss_noise_sigma: 30.0
     prob: 0.5
 data:
-  train: /workdir/data/dataset/train
-  val: /workdir/data/dataset/valid
+  train: data/dataset/train
+  val: data/dataset/valid
 model:
   _target_: src.models.line.metamodel.EHMMetaModel
   params:
@@ -42,7 +42,7 @@ model:
       scale: ${data_params.stride}
       sigma: 6
     amp: True
-    pretrain: /workdir/data/experiments/line_extreme_heatpoints2/model-035-0.834300.pth # null or path
+    pretrain: data/experiments/line_extreme_heatpoints2/model-035-0.834300.pth # null or path
 train_params:
   max_epochs: 100
   early_stopping_epochs: 50

@@ -13,7 +13,7 @@ from src.models.hrnet.dataset import get_loader
 from src.models.hrnet.metrics import L2metric, EvalAImetric
 from src.models.hrnet.transforms import test_transform, train_transform
 
-CONFIG_PATH = '/workdir/src/models/hrnet/train_config.yaml'
+CONFIG_PATH = 'src/models/hrnet/train_config.yaml'
 
 
 @hydra.main(version_base=None, config_path=os.path.dirname(CONFIG_PATH),
@@ -37,7 +37,7 @@ def train(cfg: DictConfig):
     val_loader = get_loader(cfg.data.val, cfg.data_params, val_trns, False)
     experiment_name = cfg.metadata.experiment_name
     run_name = cfg.metadata.run_name
-    save_dir = f'/workdir/data/experiments/{experiment_name}_{run_name}'
+    save_dir = f'data/experiments/{experiment_name}_{run_name}'
     metrics = [
         L2metric(num_keypoints=cfg.data_params.num_keypoints),
         EvalAImetric(hydra.utils.instantiate(cfg.camera),

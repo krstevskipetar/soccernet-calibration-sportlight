@@ -19,7 +19,7 @@ from src.models.hrnet.dataset import get_loader
 from src.models.hrnet.metrics import L2metric, EvalAImetric
 from src.models.hrnet.transforms import test_transform
 
-CONFIG_PATH = '/workdir/src/models/hrnet/val_config.yaml'
+CONFIG_PATH = 'src/models/hrnet/val_config.yaml'
 
 monitors = ['val_l2', 'val_loss', 'val_pcks-5.0' 'val_completeness',
             'val_eval_accuracy', 'val_l2_reprojection', 'val_evalai']
@@ -52,8 +52,7 @@ def validate(cfg: DictConfig) -> float:
     print(f'Validation complete in {time.perf_counter()-s_time:.4f} s.')
     metrics = {k: float(v) for k, v in metrics.items()}
     for k in list(metrics.keys()):
-        if k in monitors:
-            metrics[f'{k}_best'] = metrics[k]
+        if k in monitors: metrics[f'{k}_best'] = metrics[k]
     # To avoid problems with CUDA in the case of parallel execution
     model.nn_module.to('cpu')
     del model

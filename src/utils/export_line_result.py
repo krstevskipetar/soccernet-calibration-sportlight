@@ -134,7 +134,7 @@ def get_line_data(heat_loc: np.ndarray or torch.Tensor,
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--image-folder', type=str,
-                        default='/workdir/data/dataset/test',
+                        default='data/dataset/test',
                         help='Path to image folder that will be evaluated.')
     parser.add_argument('--result-file', type=str,
                         default='results/result_on_test_set.pkl',
