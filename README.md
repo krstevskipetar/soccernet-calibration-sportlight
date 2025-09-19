@@ -35,9 +35,22 @@ Key features of the solution:
 The environment is provided as a Docker image; build it with `make build`. To start the container, use the command `make run`. All the following commands, describing how to train models or make predictions, should be executed within the docker container.
 
 
+## Python environment
+
+Dependencies are managed with [Poetry](https://python-poetry.org/). After entering the container or working locally, install the
+project in editable mode with:
+
+```
+poetry install
+```
+
+Commands should be executed via `poetry run` to ensure the virtual environment is used, for example
+`poetry run python -m soccernet_calibration.models.hrnet.train`.
+
+
 ## Project structure
 
-* `src` - The project's source directory.
+* `src/soccernet_calibration` - The project's source package.
 * `notebooks` - Jupyter notebooks. It contains a notebook with the annotatio exploration and a notebook with ellipses geometry-related algorithms visualization.
 * `data` - The project's storage for required files.
   * `data/experiments/` - Folder with individual experiments results and artifacts (each experiment has its individual folder in this location).
@@ -46,54 +59,54 @@ The environment is provided as a Docker image; build it with `make build`. To st
 
 ## Keypoints model
 
-The HRNet based model code is in [src/models/hrnet/](src/models/hrnet). The model training is configured by Hydra config file [src/models/hrnet/train_config.yaml](src/models/hrnet/train_config.yaml). Run `python src/models/hrnet/train.py` to train the model in the docker container environment.
+The HRNet based model code is in [src/soccernet_calibration/models/hrnet/](src/soccernet_calibration/models/hrnet). The model training is configured by Hydra config file [src/soccernet_calibration/models/hrnet/train_config.yaml](src/soccernet_calibration/models/hrnet/train_config.yaml). Run `poetry run python -m soccernet_calibration.models.hrnet.train` to train the model in the docker container environment.
 
-Details on the model architecture are in the model [README.md](/src/models/hrnet/README.md).
+Details on the model architecture are in the model [README.md](/src/soccernet_calibration/models/hrnet/README.md).
 
 ### Optimize prediction model hyperparameters
 
 In order to run the hyperparameter search with Optuna:
-1. Specify the trained model path in [src/models/hrnet/val_config.yaml](src/models/hrnet/val_config.yaml). Make sure the rest of parameters for `model` and `data_params` section are the same to the values used during the model training.
-2. Set initial guess and default values for the camera calibration heuristical algorithm in [src/models/hrnet/val_config.yaml](src/models/hrnet/val_config.yaml) `camera` section. Specify parameters seach space in [src/models/hrnet/optimize_valid.yaml](src/models/hrnet/optimize_valid.yaml) in `hydra.sweeper.params` (see Hydra [docs](https://hydra.cc/docs/plugins/optuna_sweeper/) for details on the sweeper configuratiuon). The provided parameters in the files represent the actual final used values during the course of experiments for the Challenge.
-3. Run optimization: `cd src/models/hrnet/` and `python validate.py --config-name optimize_valid --multirun`.
+1. Specify the trained model path in [src/soccernet_calibration/models/hrnet/val_config.yaml](src/soccernet_calibration/models/hrnet/val_config.yaml). Make sure the rest of parameters for `model` and `data_params` section are the same to the values used during the model training.
+2. Set initial guess and default values for the camera calibration heuristical algorithm in [src/soccernet_calibration/models/hrnet/val_config.yaml](src/soccernet_calibration/models/hrnet/val_config.yaml) `camera` section. Specify parameters seach space in [src/soccernet_calibration/models/hrnet/optimize_valid.yaml](src/soccernet_calibration/models/hrnet/optimize_valid.yaml) in `hydra.sweeper.params` (see Hydra [docs](https://hydra.cc/docs/plugins/optuna_sweeper/) for details on the sweeper configuratiuon). The provided parameters in the files represent the actual final used values during the course of experiments for the Challenge.
+3. Run optimization: `poetry run python -m soccernet_calibration.models.hrnet.validate --config-name optimize_valid --multirun`.
 
 
 ## Line model
 
-The Line detection based model code is in [src/models/line/](src/models/line). 
+The Line detection based model code is in [src/soccernet_calibration/models/line/](src/soccernet_calibration/models/line). 
 The model training is configured by Hydra config file 
-[src/models/line/train_config.yaml](src/models/hrnet/train_config.yaml). 
-Run `python src/models/line/train.py` to train the model in the docker container environment.
+[src/soccernet_calibration/models/line/train_config.yaml](src/soccernet_calibration/models/hrnet/train_config.yaml). 
+Run `poetry run python -m soccernet_calibration.models.line.train` to train the model in the docker container environment.
 
-Details on the model architecture are in the model [README.md](/src/models/line/README.md).
+Details on the model architecture are in the model [README.md](/src/soccernet_calibration/models/line/README.md).
 
 
-Once the model is trained, prediction file should be prepared as described in [README.md, section Assemble line model result](/src/models/line/README.md#assemble-line-model-result).
+Once the model is trained, prediction file should be prepared as described in [README.md, section Assemble line model result](/src/soccernet_calibration/models/line/README.md#assemble-line-model-result).
 
 ## Final predictions and submit file creation
 
-The final step is the submit file preparation. It can be created by a provided script: `python src/utils/make_submit.py`.
+The final step is the submit file preparation. It can be created by a provided script: `poetry run python -m soccernet_calibration.utils.make_submit`.
 Update paths to actual model files in the accordingly. The file contains heuristics params used in the actual winning submission.
 
-In fact, actual calibration algorithms and relevant heuristics are implemented in [src/models/hrnet/prediction.py](src/models/hrnet/prediction.py). The proposed code can indeed be adapted for use in other applications, related to camera calibration.
+In fact, actual calibration algorithms and relevant heuristics are implemented in [src/soccernet_calibration/models/hrnet/prediction.py](src/soccernet_calibration/models/hrnet/prediction.py). The proposed code can indeed be adapted for use in other applications, related to camera calibration.
 
 ## Code navigation
 
 Some key code files, which could be interesting to explore to grasp the fundamental concepts behind the solution, as well as the interesting aspects that may be adapted for other applications or techniques:
 
-* Pitch model is defined in [/src/datatools/ellipse.py](/src/datatools/ellipse.py), PITCH_POINTS dictionary.
+* Pitch model is defined in [/src/soccernet_calibration/datatools/ellipse.py](/src/soccernet_calibration/datatools/ellipse.py), PITCH_POINTS dictionary.
 * Geometry algorithms:
 
-  * Ellipse tangent points and ellipse-line intersection points: [/src/datatools/ellipse.py](/src/datatools/ellipse.py)
-  * Lines intersections: [/src/datatools/intersections.py](/src/datatools/intersections.py)
+  * Ellipse tangent points and ellipse-line intersection points: [/src/soccernet_calibration/datatools/ellipse.py](/src/soccernet_calibration/datatools/ellipse.py)
+  * Lines intersections: [/src/soccernet_calibration/datatools/intersections.py](/src/soccernet_calibration/datatools/intersections.py)
 
 * Models:
 
-  * HRNet backbone: [/src/models/hrnet/hrnet.py](/src/models/hrnet/hrnet.py)
-  * Keypoints model: [/src/models/hrnet/model.py](/src/models/hrnet/model.py), loss function and efficient Pytorch-based 2D Gaussian heatmaps generation: [/src/models/hrnet/loss.py](/src/models/hrnet/loss.py)
-  * Lines model: [/src/models/line/model.py](/src/models/line/model.py)
+  * HRNet backbone: [/src/soccernet_calibration/models/hrnet/hrnet.py](/src/soccernet_calibration/models/hrnet/hrnet.py)
+  * Keypoints model: [/src/soccernet_calibration/models/hrnet/model.py](/src/soccernet_calibration/models/hrnet/model.py), loss function and efficient Pytorch-based 2D Gaussian heatmaps generation: [/src/soccernet_calibration/models/hrnet/loss.py](/src/soccernet_calibration/models/hrnet/loss.py)
+  * Lines model: [/src/soccernet_calibration/models/line/model.py](/src/soccernet_calibration/models/line/model.py)
 
-* Camera calibration algorithms: [src/models/hrnet/prediction.py](src/models/hrnet/prediction.py)
+* Camera calibration algorithms: [src/soccernet_calibration/models/hrnet/prediction.py](src/soccernet_calibration/models/hrnet/prediction.py)
 
 ## Cite
 If you use this work in your research, please cite our paper by using the following BibTeX entry:

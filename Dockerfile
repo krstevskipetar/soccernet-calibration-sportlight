@@ -21,23 +21,28 @@ RUN apt-get update && apt -y upgrade && \
     rm -rf /var/cache/apt/archives/*
 
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
+RUN pip3 install poetry
 
 # Install PyTorch
 RUN pip3 install torch==2.0.0 torchvision==0.15.1 --extra-index-url \
     https://download.pytorch.org/whl/cu118
 
-# Main system requirements
-COPY requirements.txt /tmp/requirements.txt
-RUN pip3 install -r /tmp/requirements.txt
+# Python dependencies managed by Poetry
+WORKDIR /workdir
+COPY pyproject.toml /workdir/pyproject.toml
+COPY src /workdir/src
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi \
+    && rm -rf /root/.cache/pypoetry
 RUN git config --global --add safe.directory /workdir
 
 COPY data/dataset /workdir/dataset
 COPY baseline /workdir/baseline
-RUN mkdir -p /workdir/src/models
+RUN mkdir -p /workdir/src/soccernet_calibration/models
 RUN mkdir -p /workdir/data
 
 ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
-ENV PYTHONPATH $PYTHONPATH:/workdir
+ENV PYTHONPATH $PYTHONPATH:/workdir:/workdir/src
 ENV TORCH_HOME=/workdir/data/.torch
 
 ARG VERSION

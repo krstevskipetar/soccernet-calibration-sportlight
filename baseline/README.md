@@ -34,7 +34,7 @@ and place them in [resources](resources).
 With python 3 already installed, the python environment can be installed with the following command:
 
 ```
-pip install -r requirements.txt
+poetry install
 ```
 
 ## Dataset
