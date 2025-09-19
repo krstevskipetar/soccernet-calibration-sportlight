@@ -1,11 +1,17 @@
 import os
 from pathlib import Path
 
+from omegaconf import DictConfig, OmegaConf
+from torch import compile
+from torch.backends import cudnn
+
+from soccernet_calibration.utils.torch_compat import \
+    ensure_reduce_lr_on_plateau_supports_verbose
+
+ensure_reduce_lr_on_plateau_supports_verbose()
+
 import hydra
 from argus import load_model
-from torch import compile
-from omegaconf import OmegaConf, DictConfig
-from torch.backends import cudnn
 from argus.callbacks import Checkpoint, EarlyStopping, LoggingToFile, \
     MonitorCheckpoint, ReduceLROnPlateau
 

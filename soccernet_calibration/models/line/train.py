@@ -2,11 +2,17 @@ import os
 from pathlib import Path
 from typing import Callable, Optional
 
+from omegaconf import DictConfig
+
+from soccernet_calibration.utils.torch_compat import \
+    ensure_reduce_lr_on_plateau_supports_verbose
+
+ensure_reduce_lr_on_plateau_supports_verbose()
+
 import hydra
 from argus import load_model
 from argus.callbacks import (EarlyStopping, LoggingToFile, MonitorCheckpoint,
                              ReduceLROnPlateau)
-from omegaconf import DictConfig
 from soccernet_calibration.models.line.dataset import EHMDataset
 from soccernet_calibration.models.line.metamodel import EHMMetaModel, EHMPredictionTransform
 from soccernet_calibration.models.line.metrics import AccMetric
