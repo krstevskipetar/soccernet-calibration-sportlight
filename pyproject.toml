@@ -23,6 +23,10 @@ dependencies = [
 ]
 
 [tool.poetry]
+name = "soccernet-calibration-sportlight"
+version = "0.1.0"
+description = "Utilities and models for SoccerNet camera calibration"
+authors = ["SoccerNet Calibration contributors"]
 package-mode = true
 packages = [
   { include = "soccernet_calibration" }
