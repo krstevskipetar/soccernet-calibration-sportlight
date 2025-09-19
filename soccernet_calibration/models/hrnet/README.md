@@ -5,7 +5,7 @@ The model is based on the code of [HRNet semantic segmentation](https://github.c
 ![HRNet-based keypoint detection](/readme_img/hrnet_architecture.jpg)
 _The model architecture._
 
-The model predicts 57 keypoints, depicted below. The target tensor consisted of a 2D heatmap for each point, where Gaussian peaks were positioned at the keypoint locations. Locations of the keypoints, including the approach to refine lines intersections localtions and ellipses tangent points are computed using code in [/src/soccernet_calibration/datatools/](/src/soccernet_calibration/datatools/).
+The model predicts 57 keypoints, depicted below. The target tensor consisted of a 2D heatmap for each point, where Gaussian peaks were positioned at the keypoint locations. Locations of the keypoints, including the approach to refine lines intersections localtions and ellipses tangent points are computed using code in [/soccernet_calibration/datatools/](/soccernet_calibration/datatools/).
 
 [EDA notebook](/notebooks/EDA.ipynb) contains visualization of the raw annotations and the derived keypoints, utilized in the model training process.
 

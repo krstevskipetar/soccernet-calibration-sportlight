@@ -41,8 +41,8 @@ The following plot will be generated for visual inspection.
 
 
 ## Train the extreme heatpoint model (EHM)
-- The training config file for EHM is `src/soccernet_calibration/models/line/train_config.yaml`
-- The EHM is based on HRNetV2-w48 backbone, it is possible to use a pretraind weight in `/src/soccernet_calibration/models/line/model_config/hrnet_w48.yaml`
+- The training config file for EHM is `soccernet_calibration/models/line/train_config.yaml`
+- The EHM is based on HRNetV2-w48 backbone, it is possible to use a pretraind weight in `/soccernet_calibration/models/line/model_config/hrnet_w48.yaml`
 - Run `poetry run python -m soccernet_calibration.models.line.train` to start training.
 
 ## Assemble line model result

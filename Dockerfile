@@ -30,7 +30,7 @@ RUN pip3 install torch==2.0.0 torchvision==0.15.1 --extra-index-url \
 # Python dependencies managed by Poetry
 WORKDIR /workdir
 COPY pyproject.toml /workdir/pyproject.toml
-COPY src /workdir/src
+COPY soccernet_calibration /workdir/soccernet_calibration
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi \
     && rm -rf /root/.cache/pypoetry
@@ -38,11 +38,11 @@ RUN git config --global --add safe.directory /workdir
 
 COPY data/dataset /workdir/dataset
 COPY baseline /workdir/baseline
-RUN mkdir -p /workdir/src/soccernet_calibration/models
+RUN mkdir -p /workdir/soccernet_calibration/models
 RUN mkdir -p /workdir/data
 
 ENV CUDA_DEVICE_ORDER=PCI_BUS_ID
-ENV PYTHONPATH $PYTHONPATH:/workdir:/workdir/src
+ENV PYTHONPATH $PYTHONPATH:/workdir:/workdir/soccernet_calibration
 ENV TORCH_HOME=/workdir/data/.torch
 
 ARG VERSION
