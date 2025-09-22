@@ -10,8 +10,8 @@ import cv2
 import numpy as np
 from ellipse import LsqEllipse
 
-from soccernet_calibration.datatools.line import find_closest_points
 from baseline.soccerpitch import SoccerPitch
+from soccernet_calibration.datatools.line import find_closest_points
 
 pitch = SoccerPitch()
 PITCH_POINTS = {**pitch.point_dict}
@@ -20,8 +20,8 @@ PITCH_POINTS = {**pitch.point_dict}
 def circle_tangent_points(circle_center: Tuple[float, float],
                           radius: float,
                           point: Tuple[float, float]):
-    hypotenuse = np.sqrt((point[0] - circle_center[0])**2
-                         + (point[1] - circle_center[1])**2)
+    hypotenuse = np.sqrt((point[0] - circle_center[0]) ** 2
+                         + (point[1] - circle_center[1]) ** 2)
     th = np.arccos(radius / hypotenuse)
     d = np.arctan2(point[1] - circle_center[1], point[0] - circle_center[0])
     d1 = d + th
@@ -62,9 +62,9 @@ PITCH_POINTS['CENTER_CIRCLE_L'] = np.array([-pitch.CENTER_CIRCLE_RADIUS, 0, 0],
                                            dtype=float)
 
 PITCH_POINTS['LEFT_CIRCLE_R'] = PITCH_POINTS['L_PENALTY_MARK'] + \
-    PITCH_POINTS['CENTER_CIRCLE_R']
+                                PITCH_POINTS['CENTER_CIRCLE_R']
 PITCH_POINTS['RIGHT_CIRCLE_L'] = PITCH_POINTS['R_PENALTY_MARK'] + \
-    PITCH_POINTS['CENTER_CIRCLE_L']
+                                 PITCH_POINTS['CENTER_CIRCLE_L']
 
 left_tangent_top = circle_tangent_points(
     PITCH_POINTS['L_PENALTY_MARK'][:2], pitch.CENTER_CIRCLE_RADIUS,
@@ -79,7 +79,6 @@ PITCH_POINTS['LEFT_CIRCLE_TANGENT_B'] = circle_tangent_points(
     PITCH_POINTS['L_PENALTY_AREA_BR_CORNER'][:2])[1]
 PITCH_POINTS['L_MIDDLE_PENALTY'] = PITCH_POINTS['L_PENALTY_AREA_BR_CORNER'].copy()
 PITCH_POINTS['L_MIDDLE_PENALTY'][1] = 0.0
-
 
 PITCH_POINTS['RIGHT_CIRCLE_TANGENT_T'] = circle_tangent_points(
     PITCH_POINTS['R_PENALTY_MARK'][:2], pitch.CENTER_CIRCLE_RADIUS,
@@ -178,7 +177,6 @@ PERP_LINES: List[Tuple[int, int]] = [
     (51, 52)
 ]
 
-
 POINTS_LEFT: List[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 31, 33,
                           35, 37, 39, 43, 44, 45, 46, 47, 48, 49]
 POINTS_RIGHT: List[int] = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
@@ -272,25 +270,28 @@ CONICS_KEYS = {
 }
 
 
-def get_m(a, b, c, d, e, f, x0, y0) -> Tuple[float, float]:
+def get_m(a, b, c, d, e, f, x0, y0) -> Tuple[float, float] | None:
     """Helper function for getting the tangent points."""
-    A = 4*a*c*x0*y0 + 2*a*e*x0 - b**2*x0*y0 - b*d*x0 - b*e*y0 - 2*b*f\
-        + 2*c*d*y0 + d*e
-    B = 2*np.sqrt((-4*a*c*f + a*e**2 + b**2*f - b*d*e + c*d**2)
-                  * (a*x0**2 + b*x0*y0 + c*y0**2 + d*x0 + e*y0 + f))
-    C = 4*a*c*x0**2 - b**2*x0**2 - 2*b*e*x0 + 4*c*d*x0 + 4*c*f - e**2
-    return ((A - B) / C, (A + B) / C)
+    try:
+        A = 4 * a * c * x0 * y0 + 2 * a * e * x0 - b ** 2 * x0 * y0 - b * d * x0 - b * e * y0 - 2 * b * f \
+            + 2 * c * d * y0 + d * e
+        B = 2 * np.sqrt((-4 * a * c * f + a * e ** 2 + b ** 2 * f - b * d * e + c * d ** 2)
+                        * (a * x0 ** 2 + b * x0 * y0 + c * y0 ** 2 + d * x0 + e * y0 + f))
+        C = 4 * a * c * x0 ** 2 - b ** 2 * x0 ** 2 - 2 * b * e * x0 + 4 * c * d * x0 + 4 * c * f - e ** 2
+        return (A - B) / C, (A + B) / C
+    except (RuntimeError, FloatingPointError):
+        return None
 
 
 def get_x(a, b, c, d, e, m, x0, y0):
     """Helper function for getting the tangent points."""
-    C = 2 * (a + b*m + c*m**2)
-    A = (b*m*x0 - b*y0 + 2*c*m**2*x0 - 2*c*m*y0 - d - e*m)
+    C = 2 * (a + b * m + c * m ** 2)
+    A = (b * m * x0 - b * y0 + 2 * c * m ** 2 * x0 - 2 * c * m * y0 - d - e * m)
     return A / C
 
 
 def find_tangent_point(ellipse: List[float], point: Tuple[float, float],
-                       idx: int = 0) -> Tuple[float, float]:
+                       idx: int = 0) -> Tuple[float, float] | None:
     """Find the tangent point for an ellipse for a line passing through a given
         point.
 
@@ -318,9 +319,11 @@ def find_tangent_point(ellipse: List[float], point: Tuple[float, float],
     a, b, c, d, e, f = ellipse
     x0, y0 = point
     m = get_m(a, b, c, d, e, f, x0, y0)
+    if m is None:
+        return None
     x = get_x(a, b, c, d, e, m[idx], x0, y0)
-    y = m[idx]*x+y0-m[idx]*x0
-    return (x, y)
+    y = m[idx] * x + y0 - m[idx] * x0
+    return x, y
 
 
 def add_conic_points(points: Dict[str, List[Tuple[float, float]]],
@@ -342,12 +345,14 @@ def add_conic_points(points: Dict[str, List[Tuple[float, float]]],
                 if proc['type'] == 'tangent':
                     ref_inters = PITCH_POINTS_TO_INTERSECTON[
                         proc['reference']]
-                    if ref_inters in intersections\
+                    if ref_inters in intersections \
                             and intersections[ref_inters] is not None:
-                        intersections[inters_id] =\
-                            find_tangent_point(ellipse,
-                                               intersections[ref_inters],
-                                               proc['idx'])
+                        tangent_point = find_tangent_point(ellipse,
+                                                           intersections[ref_inters],
+                                                           proc['idx'])
+                        if tangent_point is not None:
+                            intersections[inters_id] = tangent_point
+
                 elif proc['type'] == 'intersection':
                     line_name = proc['line']
                     if line_name in points and len(points[line_name]) > 1:
@@ -405,18 +410,18 @@ def select_intersect(res, points: Dict[str, List[Tuple[float, float]]],
 
     for line_name in [pn for pn in points.keys()
                       if 'left' in pn.split()[:3]
-                      and pn not in (line, circle)]:
-        y_list = [p[1]*img_size[1] for p in points[line_name]]
+                         and pn not in (line, circle)]:
+        y_list = [p[1] * img_size[1] for p in points[line_name]]
         if any([y > p_min_y for y in y_list]):
             lr = True
             break
     if circle == 'Circle left':
-        y_list = [p[1]*img_size[1] for p in points[circle]]
-        if any([(p_min_y-y) > 3 for y in y_list]):
+        y_list = [p[1] * img_size[1] for p in points[circle]]
+        if any([(p_min_y - y) > 3 for y in y_list]):
             lr = True
     if circle == 'Circle right':
-        y_list = [p[1]*img_size[1] for p in points[circle]]
-        if any([(y-p_min_y) > 3 for y in y_list]):
+        y_list = [p[1] * img_size[1] for p in points[circle]]
+        if any([(y - p_min_y) > 3 for y in y_list]):
             lr = True
     bottom, top = sort_conic_inters(p1, p2, lr)
     if inters_type == 'Bottom':
@@ -435,6 +440,7 @@ def ellipse_line_intersect(ellipse, line: np.ndarray) -> np.ndarray | None:
     Returns:
         np.ndarray | None: The intersection point if exists, None - otherwise.
     """
+    np.seterr(all='raise')
     conic_coeffs = ellipse
     res = None
     if len(conic_coeffs) == 6:
@@ -457,15 +463,17 @@ def ellipse_line_intersect(ellipse, line: np.ndarray) -> np.ndarray | None:
                 l_line = find_closest_points(line, x, y)
                 if l_line is not None:
                     l_int_x, l_int_y = [], []
-                    try:
-                        l_a, l_b = np.polyfit(
-                            l_line[:, 0], l_line[:, 1], 1)
-                        l_int_x, l_int_y = quadratic_linear_intersection(
-                            *conic_coeffs, l_a, l_b)
-                    except:
-                        print(l_line[:, 0], l_line[:, 1])
+                    with warnings.catch_warnings():
+                        warnings.filterwarnings('error')
+                        try:
+                            l_a, l_b = np.polyfit(
+                                l_line[:, 0], l_line[:, 1], 1)
+                            l_int_x, l_int_y = quadratic_linear_intersection(
+                                *conic_coeffs, l_a, l_b)
+                        except (np.RankWarning, FloatingPointError):
+                            print(l_line[:, 0], l_line[:, 1])
                     if len(l_int_x) > 0:
-                        dist = [(l_int_x[j]-x)**2+(l_int_y[j]-y)
+                        dist = [(l_int_x[j] - x) ** 2 + (l_int_y[j] - y)
                                 ** 2 for j in range(len(l_int_x))]
                         l_idx = np.argmin(dist)
                         int_x[i] = l_int_x[l_idx]
@@ -477,7 +485,7 @@ def ellipse_line_intersect(ellipse, line: np.ndarray) -> np.ndarray | None:
 def sort_conic_inters(p1, p2, lr: bool = True):
     dx = abs(p1[0] - p2[0])
     dy = abs(p1[1] - p2[1])
-    if dy < 1.0 or dx/dy > 10:
+    if dy < 1.0 or dx / dy > 10:
         if p1[0] < p2[0]:
             bottom, top = p2, p1
         else:
@@ -498,19 +506,21 @@ def get_homography(src, dst, threshold: float = 5.0):
     return hom
 
 
-def quadratic_linear_intersection(a, b, c, d, e, f, k, h)\
+def quadratic_linear_intersection(a, b, c, d, e, f, k, h) \
         -> Tuple[List[float], List[float]]:
     """Find intersections of a*x^2+b*x*y+c*y^2+d*x+e*y+f=0 and k*x+h=y.
     """
+
     def y(x):
-        return k*x+h
+        return k * x + h
+
     x_intersections = list(
-        np.roots([a+b*k+c*k**2, b*h+2*c*k*h+d+e*k, c*h**2+h*e+f]))
+        np.roots([a + b * k + c * k ** 2, b * h + 2 * c * k * h + d + e * k, c * h ** 2 + h * e + f]))
     y_intersections = [y(x) for x in x_intersections]
     return x_intersections, y_intersections
 
 
 def find_conic_y(a, b, c, d, e, f, x):
-    y_intersections = list(np.roots([c, b*x+e, a*x**2+d*x+f]))
+    y_intersections = list(np.roots([c, b * x + e, a * x ** 2 + d * x + f]))
     x_intersections = [x] * len(y_intersections)
     return x_intersections, y_intersections
