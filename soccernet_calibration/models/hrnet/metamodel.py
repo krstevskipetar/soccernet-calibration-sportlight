@@ -21,7 +21,7 @@ class HRNetMetaModel(Model):
         super().__init__(params)
         self.amp = (False if 'amp' not in self.params
                     else bool(self.params['amp']))
-        self.scaler = torch.cuda.amp.GradScaler() if self.amp else None
+        self.scaler = torch.amp.GradScaler('cuda') if self.amp else None
 
     def train_step(self, batch, state: State) -> dict:
         self.train()
@@ -31,7 +31,7 @@ class HRNetMetaModel(Model):
         del batch['raw_annot']
         del batch['img_name']
         batch = deep_to(batch, device=self.device, non_blocking=True)
-        with torch.cuda.amp.autocast(enabled=self.amp):
+        with torch.amp.autocast('cuda', enabled=self.amp):
             prediction = self.nn_module(batch['image'])
         loss = self.loss(prediction, batch['keypoints'], batch['mask'])
 
@@ -64,7 +64,7 @@ class HRNetMetaModel(Model):
             del batch['raw_annot']
             del batch['img_name']
             batch = deep_to(batch, device=self.device, non_blocking=True)
-            with torch.cuda.amp.autocast(enabled=self.amp):
+            with torch.amp.autocast('cuda', enabled=self.amp):
                 prediction = self.nn_module(batch['image'])
                 # keypoints = batch['keypoints'].detach(
                 # ).clone().reshape(-1, 57, 3)

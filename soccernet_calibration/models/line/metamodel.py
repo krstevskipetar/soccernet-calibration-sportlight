@@ -2,6 +2,7 @@ import torch
 from argus import Model
 from argus.engine import State
 from argus.utils import deep_detach, deep_to
+
 from soccernet_calibration.models.line.loss import EHMLoss
 from soccernet_calibration.models.line.model import HRNetHeatmap
 from soccernet_calibration.models.line.transforms import EHMPredictionTransform
@@ -17,13 +18,13 @@ class EHMMetaModel(Model):
         super().__init__(params)
         self.amp = (False if 'amp' not in self.params
                     else bool(self.params['amp']))
-        self.scaler = torch.cuda.amp.GradScaler() if self.amp else None
+        self.scaler = torch.amp.GradScaler('cuda') if self.amp else None
 
     def train_step(self, batch, state: State) -> dict:
         self.train()
         self.optimizer.zero_grad()
         batch = deep_to(batch, device=self.device, non_blocking=True)
-        with torch.cuda.amp.autocast(enabled=self.amp):
+        with torch.amp.autocast('cuda', enabled=self.amp):
             prediction = self.nn_module(batch['image'])
         loss = self.loss(prediction, batch['keypoint_maps'])
 
@@ -54,7 +55,7 @@ class EHMMetaModel(Model):
         with torch.no_grad():
             batch = deep_to(batch, device=self.device, non_blocking=True)
 
-            with torch.cuda.amp.autocast(enabled=self.amp):
+            with torch.amp.autocast('cuda', enabled=self.amp):
                 prediction = self.nn_module(batch['image'])
 
             loss = self.loss(prediction, batch['keypoint_maps'])
